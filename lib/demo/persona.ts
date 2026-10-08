@@ -2,8 +2,8 @@ import { INSURERS } from "@/lib/demo/fixtures";
 import type { UserProfile } from "@/lib/treatments/types";
 
 /**
- * Frozen fictional persona for Demo Mode.
- * Not a real patient — safe for hackathon presentations only.
+ * Frozen fictional persona for hackathon form tap-to-fill.
+ * Not a real patient. Never used for medication dose/frequency fields.
  */
 export const DEMO_PERSONA = {
   profile: {

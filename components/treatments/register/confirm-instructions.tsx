@@ -13,7 +13,6 @@ import { StepProgress } from "@/components/treatments/step-progress";
 import { useTreatmentDemo } from "@/components/treatments/treatment-demo-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { isDemoMode } from "@/lib/demo/demo-mode";
 import {
   extractionSeedKey,
   pendingFields,
@@ -92,10 +91,6 @@ export function ConfirmInstructions() {
       router.replace("/treatments/register/prescription");
     }
   }, [hydrated, extraction, router]);
-
-  if (hydrated && isDemoMode() && !startDate) {
-    setStartDate(todayIsoDate());
-  }
 
   if (!hydrated || !extraction) {
     return (

@@ -214,7 +214,7 @@ Legacy UI: `components/prescriptions/prescription-extract-client.tsx` is not mou
 |----------|-------|--------|
 | `OPENAI_API_KEY` | Server only | Required for OCR |
 | `OPENAI_MODEL` | Server only | Optional; defaults to `gpt-4.1-mini` |
-| `NEXT_PUBLIC_DEMO_MODE` | Client | Set to `true` for hackathon autofill of non-medical forms (`lib/demo/persona.ts`). Does **not** invent OCR doses/frequencies or skip medical review confirmation. |
+| `NEXT_PUBLIC_DEMO_MODE` | Client | Legacy flag; unused for autofill. Profile/insurance/start-date fill on input focus from `lib/demo/persona.ts` (never medication dose/frequency). |
 | `NODE_ENV` | Runtime | Used for limited API error logging |
 
 - Never prefix secrets with `NEXT_PUBLIC_`.
@@ -261,7 +261,7 @@ Existing tests: `lib/validations/image.test.ts`, `lib/validations/prescription.t
 6. **Simulated integrations** (insurance, payment, WhatsApp, promo catalog) must remain explicitly labeled (`DemoBanner` or equivalent).
 7. **Prescription optional in product principle**, but the implemented demo happy path requires a prescription scan.
 8. WhatsApp copy must clarify reminders **do not replace medical advice** (confirmation screen).
-9. **Demo Mode** may autofill profile/insurance/start date only. It must never auto-approve medications or skip the “¿Has revisado las instrucciones…?” modal after valid confirm.
+9. **Tap-to-fill** on profile/insurance/start date may fill empty fields from the fictional persona on focus. It must never autofill medication dose/frequency or skip the “¿Has revisado las instrucciones…?” modal after valid confirm.
 
 ---
 

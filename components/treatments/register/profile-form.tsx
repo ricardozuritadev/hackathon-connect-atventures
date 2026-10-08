@@ -10,14 +10,13 @@ import { StepProgress } from "@/components/treatments/step-progress";
 import { useTreatmentDemo } from "@/components/treatments/treatment-demo-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { isDemoMode } from "@/lib/demo/demo-mode";
 import { DEMO_PERSONA, fillEmptyString } from "@/lib/demo/persona";
 import type { PatientFor } from "@/lib/treatments/types";
 import { cn } from "@/lib/utils";
 
 export function ProfileForm() {
   const router = useRouter();
-  const { state, hydrated, setProfile } = useTreatmentDemo();
+  const { state, setProfile } = useTreatmentDemo();
   const existing = state.profile ?? state.draft.profile;
 
   const [patientFor, setPatientFor] = useState<PatientFor>(
@@ -28,30 +27,21 @@ export function ProfileForm() {
   const [phone, setPhone] = useState(existing?.phone ?? "");
   const [birthDate, setBirthDate] = useState(existing?.birthDate ?? "");
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [demoSeeded, setDemoSeeded] = useState(false);
 
-  if (hydrated && isDemoMode() && !demoSeeded) {
-    const source = state.profile ?? state.draft.profile;
+  function fillEmptyDemoFields() {
     setFullName((current) =>
-      fillEmptyString(source?.fullName ?? current, DEMO_PERSONA.profile.fullName)
+      fillEmptyString(current, DEMO_PERSONA.profile.fullName)
     );
     setDocumentId((current) =>
-      fillEmptyString(
-        source?.documentId ?? current,
-        DEMO_PERSONA.profile.documentId
-      )
+      fillEmptyString(current, DEMO_PERSONA.profile.documentId)
     );
     setPhone((current) =>
-      fillEmptyString(source?.phone ?? current, DEMO_PERSONA.profile.phone)
+      fillEmptyString(current, DEMO_PERSONA.profile.phone)
     );
     setBirthDate((current) =>
-      fillEmptyString(
-        source?.birthDate ?? current,
-        DEMO_PERSONA.profile.birthDate
-      )
+      fillEmptyString(current, DEMO_PERSONA.profile.birthDate)
     );
     setPatientFor((current) => current || DEMO_PERSONA.profile.patientFor);
-    setDemoSeeded(true);
   }
 
   function validate(): boolean {
@@ -130,6 +120,7 @@ export function ProfileForm() {
             id="fullName"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
+            onFocus={fillEmptyDemoFields}
             autoComplete="name"
             placeholder="Ana Pérez"
           />
@@ -140,6 +131,7 @@ export function ProfileForm() {
             id="documentId"
             value={documentId}
             onChange={(e) => setDocumentId(e.target.value)}
+            onFocus={fillEmptyDemoFields}
             placeholder="Número de cédula"
           />
         </Field>
@@ -150,6 +142,7 @@ export function ProfileForm() {
             type="tel"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
+            onFocus={fillEmptyDemoFields}
             autoComplete="tel"
             placeholder="09xxxxxxxx"
           />
@@ -165,6 +158,7 @@ export function ProfileForm() {
             type="date"
             value={birthDate}
             onChange={(e) => setBirthDate(e.target.value)}
+            onFocus={fillEmptyDemoFields}
           />
         </Field>
 

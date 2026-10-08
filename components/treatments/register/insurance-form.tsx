@@ -9,7 +9,6 @@ import { ScreenIntro } from "@/components/treatments/screen-intro";
 import { useTreatmentDemo } from "@/components/treatments/treatment-demo-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { isDemoMode } from "@/lib/demo/demo-mode";
 import { DEMO_PERSONA, fillEmptyString } from "@/lib/demo/persona";
 import { INSURERS } from "@/lib/demo/fixtures";
 
@@ -24,7 +23,6 @@ export function InsuranceForm() {
   );
   const [beneficiary, setBeneficiary] = useState("self");
   const [error, setError] = useState<string | null>(null);
-  const [demoSeeded, setDemoSeeded] = useState(false);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -33,23 +31,19 @@ export function InsuranceForm() {
     }
   }, [hydrated, state.draft.confirmedMedications.length, router]);
 
-  if (hydrated && isDemoMode() && !demoSeeded) {
+  function fillEmptyDemoFields() {
+    const holderFallback =
+      state.profile?.fullName || DEMO_PERSONA.profile.fullName;
     setInsurer((current) =>
       current.trim() ? current : DEMO_PERSONA.insurance.insurer
     );
     setPolicyNumber((current) =>
       fillEmptyString(current, DEMO_PERSONA.insurance.policyNumber)
     );
-    setPolicyHolder((current) =>
-      fillEmptyString(
-        current,
-        state.profile?.fullName || DEMO_PERSONA.profile.fullName
-      )
-    );
+    setPolicyHolder((current) => fillEmptyString(current, holderFallback));
     setBeneficiary((current) =>
       current.trim() ? current : DEMO_PERSONA.insurance.beneficiary
     );
-    setDemoSeeded(true);
   }
 
   function handleSubmit(event: FormEvent) {
@@ -83,6 +77,7 @@ export function InsuranceForm() {
             id="insurer"
             value={insurer}
             onChange={(e) => setInsurer(e.target.value)}
+            onFocus={fillEmptyDemoFields}
             className="h-12 w-full rounded-[var(--radius-field)] border border-border-default bg-white px-3.5 text-base"
           >
             {INSURERS.map((name) => (
@@ -98,6 +93,7 @@ export function InsuranceForm() {
             id="policyNumber"
             value={policyNumber}
             onChange={(e) => setPolicyNumber(e.target.value)}
+            onFocus={fillEmptyDemoFields}
             placeholder="Ingresa el número de póliza"
           />
         </Field>
@@ -107,6 +103,7 @@ export function InsuranceForm() {
             id="policyHolder"
             value={policyHolder}
             onChange={(e) => setPolicyHolder(e.target.value)}
+            onFocus={fillEmptyDemoFields}
             placeholder="Nombre completo"
           />
         </Field>
@@ -116,6 +113,7 @@ export function InsuranceForm() {
             id="beneficiary"
             value={beneficiary}
             onChange={(e) => setBeneficiary(e.target.value)}
+            onFocus={fillEmptyDemoFields}
             className="h-12 w-full rounded-[var(--radius-field)] border border-border-default bg-white px-3.5 text-base"
           >
             <option value="self">Yo soy el titular</option>
