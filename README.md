@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NEXO — Phase 1
 
-## Getting Started
+POC de digitalización de recetas médicas con OpenAI.
 
-First, run the development server:
+**Importante:** usa únicamente recetas ficticias o sintéticas. No cargues datos reales de pacientes.
+
+## Stack
+
+- Next.js 16 (App Router) + React 19 + TypeScript
+- Tailwind CSS v4 + shadcn/ui
+- Zod
+- OpenAI (`openai`, modelo `gpt-4.1-mini`)
+
+## Configuración
+
+1. Copia las variables de entorno:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env.local
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Obtén una API key en [OpenAI Platform](https://platform.openai.com/api-keys) y completa:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```env
+OPENAI_API_KEY=tu_clave
+OPENAI_MODEL=gpt-4.1-mini
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. Instala dependencias y arranca:
 
-## Learn More
+```bash
+npm install
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+Abre [http://localhost:3000/prescriptions/extract](http://localhost:3000/prescriptions/extract).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Variables en Vercel
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Configura en el proyecto de Vercel (Settings → Environment Variables):
 
-## Deploy on Vercel
+| Variable | Público | Descripción |
+|----------|---------|-------------|
+| `OPENAI_API_KEY` | No | Clave del OpenAI API |
+| `OPENAI_MODEL` | No | Modelo multimodal (p. ej. `gpt-4.1-mini`) |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Nunca uses el prefijo `NEXT_PUBLIC_` para la clave.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Flujo
+
+1. Sube una imagen JPEG, PNG o WebP (máx. 5 MB).
+2. Pulsa **Analizar receta**.
+3. Revisa y corrige los datos extraídos antes de continuar.
+
+La extracción es una propuesta de IA y requiere verificación humana.
