@@ -10,12 +10,15 @@ import { useTreatmentDemo } from "@/components/treatments/treatment-demo-provide
 import { Button } from "@/components/ui/button";
 import { formatDisplayDate, formatMoney } from "@/lib/demo/fixtures";
 
+const FINALIZE_DELAY_MS = 15_000;
+
 function ConfirmationContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { state, hydrated, activateWhatsApp, resetDraft } = useTreatmentDemo();
+  const { state, hydrated, resetDraft } = useTreatmentDemo();
   const treatmentId = searchParams.get("treatmentId");
   const draftClearedRef = useRef(false);
+  const finalizeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const treatment = useMemo(() => {
     if (treatmentId) {
@@ -27,7 +30,7 @@ function ConfirmationContent() {
   const [doseReminders, setDoseReminders] = useState(true);
   const [refillReminders, setRefillReminders] = useState(true);
   const [promotions, setPromotions] = useState(true);
-  const [consentError, setConsentError] = useState<string | null>(null);
+  const [finishing, setFinishing] = useState(false);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -41,6 +44,15 @@ function ConfirmationContent() {
     }
   }, [hydrated, treatment, router, resetDraft]);
 
+  useEffect(() => {
+    return () => {
+      if (finalizeTimerRef.current) {
+        clearTimeout(finalizeTimerRef.current);
+        finalizeTimerRef.current = null;
+      }
+    };
+  }, []);
+
   if (!hydrated || !treatment) {
     return (
       <AppShell>
@@ -49,26 +61,20 @@ function ConfirmationContent() {
     );
   }
 
-  function handleActivate() {
-    if (!treatment) return;
+  function handleFinalize() {
+    if (!treatment || finishing) return;
 
-    setConsentError(null);
-    if (!doseReminders && !refillReminders && !promotions) {
-      setConsentError("Selecciona al menos una categoría de notificación.");
-      return;
+    setFinishing(true);
+    const id = treatment.id;
+
+    if (finalizeTimerRef.current) {
+      clearTimeout(finalizeTimerRef.current);
     }
 
-    const id = treatment.id;
-    activateWhatsApp({
-      doseReminders,
-      refillReminders,
-      promotions,
-      doseTimes: ["08:00", "20:00"],
-      refillDaysBefore: 5,
-      consented: true,
-      whatsappActive: true,
-    });
-    router.push(`/treatments/${id}`);
+    finalizeTimerRef.current = setTimeout(() => {
+      finalizeTimerRef.current = null;
+      router.replace(`/treatments/${id}/whatsapp`);
+    }, FINALIZE_DELAY_MS);
   }
 
   return (
@@ -134,22 +140,17 @@ function ConfirmationContent() {
             onChange={setPromotions}
           />
 
-          {consentError ? (
-            <p role="alert" className="text-sm text-destructive">
-              {consentError}
-            </p>
-          ) : null}
-
           <Button
             type="button"
             variant="whatsapp"
             className="w-full"
-            onClick={handleActivate}
+            disabled={finishing}
+            onClick={handleFinalize}
           >
-            Activar WhatsApp
+            Finalizar
           </Button>
           <p className="text-center text-xs text-text-secondary">
-            Al activar, autorizas recibir las categorías seleccionadas en el
+            Los recordatorios se enviarán a las categorías seleccionadas en el
             número registrado.
           </p>
         </section>
