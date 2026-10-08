@@ -1,4 +1,4 @@
-# NEXO — Phase 1
+# Mis Tratamientos — Phase 1
 
 POC de digitalización de recetas médicas con OpenAI.
 
